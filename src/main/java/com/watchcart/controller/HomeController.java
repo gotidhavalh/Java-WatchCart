@@ -1,29 +1,23 @@
 package com.watchcart.controller;
 
-import com.watchcart.model.Product;
-import com.watchcart.repository.CategoryRepository;
-import com.watchcart.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.watchcart.dto.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/api")
 public class HomeController {
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @GetMapping("/")
-    public String home(Model model) {
-        List<Product> newArrivals = productService.getNewArrivals();
-        model.addAttribute("newArrivals", newArrivals);
-        model.addAttribute("categories", categoryRepository.findAll());
-        return "index";
+    @GetMapping
+    public ResponseEntity<ApiResponse<Map<String, String>>> health() {
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                "app", "WatchCart",
+                "version", "1.0.0",
+                "status", "running"
+        )));
     }
 }

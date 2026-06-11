@@ -1,21 +1,23 @@
 package com.watchcart.controller;
 
+import com.watchcart.dto.ApiResponse;
+import com.watchcart.dto.PlaceOrderRequest;
 import com.watchcart.model.Order;
 import com.watchcart.model.User;
 import com.watchcart.service.OrderService;
 import com.watchcart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Controller
-@RequestMapping("/orders")
+@RestController
+@RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
@@ -25,45 +27,26 @@ public class OrderController {
     private UserService userService;
 
     @GetMapping
-    public String myOrders(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public ResponseEntity<ApiResponse<List<Order>>> myOrders(
+            @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByEmail(userDetails.getUsername());
-        List<Order> orders = orderService.getOrdersByUserId(user.getId());
-        model.addAttribute("orders", orders);
-        return "orders";
+        return ResponseEntity.ok(ApiResponse.ok(orderService.getOrdersByUserId(user.getId())));
     }
 
     @GetMapping("/{id}")
-    public String orderDetail(
+    public ResponseEntity<ApiResponse<Order>> getOrder(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails,
-            Model model) {
-        Order order = orderService.getOrderById(id);
-        model.addAttribute("order", order);
-        return "order-detail";
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.ok(orderService.getOrderById(id)));
     }
 
-    @GetMapping("/checkout")
-    public String checkoutPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    @PostMapping
+    public ResponseEntity<ApiResponse<Order>> placeOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody PlaceOrderRequest req) {
         User user = userService.findByEmail(userDetails.getUsername());
-        model.addAttribute("user", user);
-        return "checkout";
-    }
-
-    @PostMapping("/place")
-    public String placeOrder(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String shippingAddress,
-            @RequestParam String paymentMethod,
-            RedirectAttributes redirectAttributes) {
-        try {
-            User user = userService.findByEmail(userDetails.getUsername());
-            Order order = orderService.placeOrder(user, shippingAddress, paymentMethod);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Order placed successfully! Order #" + order.getOrderNumber());
-            return "redirect:/orders/" + order.getId();
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/orders/checkout";
-        }
+        Order order = orderService.placeOrder(user, req.getShippingAddress(), req.getPaymentMethod());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Order placed successfully", order));
     }
 }

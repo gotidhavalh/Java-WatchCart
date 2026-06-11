@@ -1,72 +1,57 @@
 package com.watchcart.controller;
 
+import com.watchcart.dto.ApiResponse;
+import com.watchcart.dto.RegisterRequest;
+import com.watchcart.dto.UpdateProfileRequest;
 import com.watchcart.model.User;
 import com.watchcart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login";
-    }
-
-    @GetMapping("/register")
-    public String registerPage(Model model) {
-        model.addAttribute("user", new User());
-        return "register";
-    }
-
     @PostMapping("/register")
-    public String registerUser(
-            @Valid @ModelAttribute("user") User user,
-            BindingResult result,
-            RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            return "register";
-        }
-        try {
-            userService.registerUser(user);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Registration successful! Please log in.");
-            return "redirect:/login";
-        } catch (IllegalArgumentException e) {
-            result.rejectValue("email", "error.user", e.getMessage());
-            return "register";
-        }
+    public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody RegisterRequest req) {
+        User user = new User();
+        user.setFullName(req.getFullName());
+        user.setEmail(req.getEmail());
+        user.setPassword(req.getPassword());
+        user.setPhoneNumber(req.getPhoneNumber());
+        User saved = userService.registerUser(user);
+        saved.setPassword(null);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Registration successful", saved));
     }
 
-    @GetMapping("/profile")
-    public String profilePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<User>> getProfile(
+            @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByEmail(userDetails.getUsername());
-        model.addAttribute("user", user);
-        return "profile";
+        user.setPassword(null);
+        return ResponseEntity.ok(ApiResponse.ok(user));
     }
 
-    @PostMapping("/profile/update")
-    public String updateProfile(
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<User>> updateProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute User updatedUser,
-            RedirectAttributes redirectAttributes) {
+            @Valid @RequestBody UpdateProfileRequest req) {
         User user = userService.findByEmail(userDetails.getUsername());
-        user.setFullName(updatedUser.getFullName());
-        user.setPhoneNumber(updatedUser.getPhoneNumber());
-        user.setAddress(updatedUser.getAddress());
-        userService.updateUser(user);
-        redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully!");
-        return "redirect:/profile";
+        user.setFullName(req.getFullName());
+        user.setPhoneNumber(req.getPhoneNumber());
+        user.setAddress(req.getAddress());
+        User updated = userService.updateUser(user);
+        updated.setPassword(null);
+        return ResponseEntity.ok(ApiResponse.ok("Profile updated", updated));
     }
 }
