@@ -66,56 +66,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- ============================================================ -->
-        <!--  INTENTIONALLY VULNERABLE DEPENDENCIES (for demo/lab use)    -->
-        <!-- ============================================================ -->
-
-        <!--
-            CVE-2021-44228 / Log4Shell (CVSS 10.0 CRITICAL)
-            Remote Code Execution via JNDI lookup in log messages.
-            Affects log4j-core 2.0-beta9 to 2.14.1
-        -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.14.1</version>
-        </dependency>
-
-        <!--
-            CVE-2015-6420 / CVE-2017-15708 (CVSS 9.8 CRITICAL)
-            Java deserialization gadget chain in Apache Commons Collections 3.x.
-            Allows unauthenticated RCE via crafted serialised Java objects.
-        -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-
-        <!--
-            CVE-2022-22965 / Spring4Shell (CVSS 9.8 CRITICAL)
-            Data Binding RCE in Spring Framework < 5.3.18 / 5.2.20 when
-            running on JDK 9+ with a Servlet container.
-        -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>5.3.17</version>
-        </dependency>
-
-        <!--
-            CVE-2021-22112 (CVSS 8.8 HIGH)
-            Privilege escalation in Spring Security < 5.4.4 via
-            AuthorizationManagerRequestMatcherRegistry ordering.
-        -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>5.3.8.RELEASE</version>
-        </dependency>
-
-        <!-- ============================================================ -->
-
         <!-- DevTools (dev only) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -136,7 +86,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- CVE-2022-42889 (Apache Commons Text interpolation) when misused with untrusted input -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
