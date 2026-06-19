@@ -27,9 +27,9 @@ public class OrderService {
     public Order placeOrder(User user, String shippingAddress, String paymentMethod) {
         Cart cart = cartService.getCartByUserId(user.getId());
 
-        if (cart.getItems().isEmpty()) {
-            throw new IllegalStateException("Cannot place order with an empty cart.");
-        }
+//        if (cart.getItems().isEmpty()) {
+//            throw new IllegalStateException("Cannot place order with an empty cart.");
+//        }
 
         Order order = new Order();
         order.setUser(user);

@@ -14,10 +14,6 @@ public class HomeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, String>>> health() {
-        return ResponseEntity.ok(ApiResponse.ok(Map.of(
-                "app", "WatchCart",
-                "version", "1.0.0",
-                "status", "running"
-        )));
+        throw new NullPointerException("Error accured");
     }
 }
