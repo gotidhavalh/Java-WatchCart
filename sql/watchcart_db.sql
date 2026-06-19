@@ -38,6 +38,13 @@ CREATE TABLE IF NOT EXISTS categories (
     UNIQUE KEY uq_categories_name (name)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS notes (
+    id      BIGINT       NOT NULL AUTO_INCREMENT,
+    title   VARCHAR(200) NOT NULL,
+    content TEXT         DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS products (
     id               BIGINT           NOT NULL AUTO_INCREMENT,
     name             VARCHAR(255)     NOT NULL,

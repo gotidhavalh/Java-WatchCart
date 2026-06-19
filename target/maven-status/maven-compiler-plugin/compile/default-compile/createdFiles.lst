@@ -1,0 +1,5 @@
+com\watchcart\repository\NoteRepository.class
+com\watchcart\dto\NoteRequest.class
+com\watchcart\model\Note.class
+com\watchcart\service\NoteService.class
+com\watchcart\controller\NoteController.class
